@@ -7,10 +7,13 @@
     <persistence-unit name="teleExpertisePU" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
+        <class>com.teleexpertise.entity.Specialiste</class>
+        <class>com.teleexpertise.entity.DemandeExpertise</class>
+
         <properties>
             <!-- Database Connection Settings -->
             <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/tele_expertise"/>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/clinic_db"/>
             <property name="jakarta.persistence.jdbc.user" value="postgres"/>
             <property name="jakarta.persistence.jdbc.password" value="postgres"/>
 
@@ -20,8 +23,8 @@
             <property name="hibernate.format_sql" value="true"/>
             <property name="hibernate.highlight_sql" value="true"/>
 
-            <!-- Schema Management: update tables on startup during development -->
-            <property name="hibernate.hbm2ddl.auto" value="update"/>
+            <!-- Schema Management: validate existing tables on startup -->
+            <property name="hibernate.hbm2ddl.auto" value="validate"/>
         </properties>
     </persistence-unit>
 </persistence>
