@@ -1,0 +1,43 @@
+package com.teleexpertise.repository;
+
+import com.teleexpertise.config.JpaUtil;
+import com.teleexpertise.entity.DemandeExpertise;
+import jakarta.persistence.EntityManager;
+
+import java.util.List;
+import java.util.Optional;
+
+public class DemandeExpertiseRepository {
+
+    public List<DemandeExpertise> findBySpecialisteId(Long specialisteId) {
+        EntityManager em = JpaUtil.getEntityManager();
+        try {
+            return em.createQuery(
+                            "SELECT d FROM DemandeExpertise d WHERE d.specialisteId = :specialisteId",
+                            DemandeExpertise.class
+                    )
+                    .setParameter("specialisteId", specialisteId)
+                    .getResultList();
+
+        } finally {
+            em.close();
+        }
+    }
+
+    public Optional<DemandeExpertise> findByConsultationId(Long consultationId) {
+        EntityManager em = JpaUtil.getEntityManager();
+
+        try {
+            return em.createQuery(
+                            "SELECT d FROM DemandeExpertise d WHERE d.consultationId = :consultationId",
+                            DemandeExpertise.class
+                    )
+                    .setParameter("consultationId", consultationId)
+                    .getResultStream()
+                    .findFirst();
+
+        } finally {
+            em.close();
+        }
+    }
+}
