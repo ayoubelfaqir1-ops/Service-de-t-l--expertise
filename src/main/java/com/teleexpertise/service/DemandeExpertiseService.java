@@ -5,12 +5,13 @@ import com.teleexpertise.entity.DemandeExpertise;
 import com.teleexpertise.repository.ConsultationRepository;
 import com.teleexpertise.repository.DemandeExpertiseRepository;
 import com.teleexpertise.repository.SpecialisteRepository;
+import com.teleexpertise.repository.impl.SpecialisteRepositoryImpl;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
 
 public class DemandeExpertiseService {
 
-    SpecialisteRepository specialisteRepository = new SpecialisteRepository();
+    SpecialisteRepository specialisteRepository = new SpecialisteRepositoryImpl();
     ConsultationRepository consultationRepository = new ConsultationRepository();
     DemandeExpertiseRepository demandeExpertiseRepository = new DemandeExpertiseRepository();
 
