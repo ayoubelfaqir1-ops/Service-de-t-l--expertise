@@ -76,6 +76,7 @@
             <version>0.4</version>
         </dependency>
 
+        <!-- Support Jackson pour LocalDateTime / LocalDate / LocalTime -->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
