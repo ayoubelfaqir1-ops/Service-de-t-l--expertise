@@ -9,6 +9,30 @@ import java.util.Optional;
 
 public class DemandeExpertiseRepository {
 
+    public DemandeExpertise create(DemandeExpertise demande){
+
+        EntityManager em = JpaUtil.getEntityManager();
+
+        try {
+            em.getTransaction().begin();
+
+            em.persist(demande);
+
+            em.getTransaction().commit();
+
+            return demande;
+        }
+        catch(Exception e){
+            if(em.getTransaction().isActive()){
+                em.getTransaction().rollback();
+            }
+            throw e;
+        }
+        finally {
+            em.close();
+        }
+    }
+
     public List<DemandeExpertise> findBySpecialisteId(Long specialisteId) {
         EntityManager em = JpaUtil.getEntityManager();
         try {
