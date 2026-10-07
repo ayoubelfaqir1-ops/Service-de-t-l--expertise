@@ -1,20 +1,16 @@
 package com.teleexpertise.repository;
 
-import com.teleexpertise.config.JpaUtil;
 import com.teleexpertise.entity.Specialiste;
-import jakarta.persistence.EntityManager;
+import com.teleexpertise.enums.Specialite;
 
-public class SpecialisteRepository {
+import java.util.List;
+import java.util.Optional;
 
-    public Specialiste findById(Long id){
-
-        EntityManager em = JpaUtil.getEntityManager();
-
-        try {
-           return em.find(Specialiste.class, id);
-        }
-        finally {
-            em.close();
-        }
-    }
+public interface SpecialisteRepository {
+    Specialiste save(Specialiste specialiste);
+    Optional<Specialiste> findById(Long id);
+    List<Specialiste> findAll();
+    List<Specialiste> findBySpecialite(Specialite specialite);
+    Optional<Specialiste> findByUtilisateurId(Long utilisateurId);
+    void delete(Specialiste specialite);
 }
