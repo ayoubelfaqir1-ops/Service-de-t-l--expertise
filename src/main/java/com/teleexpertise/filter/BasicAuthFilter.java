@@ -12,11 +12,18 @@ import jakarta.ws.rs.ext.Provider;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+import com.teleexpertise.entity.Utilisateur;
+import com.teleexpertise.repository.UtilisateurRepository;
+import org.mindrot.jbcrypt.BCrypt;
+
+
 @Provider
 @Priority(Priorities.AUTHENTICATION)
 public class BasicAuthFilter implements ContainerRequestFilter {
 
     private static final String BASIC_PREFIX = "Basic ";
+
+    private final UtilisateurRepository utilisateurRepository = new UtilisateurRepository();
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
@@ -55,8 +62,30 @@ public class BasicAuthFilter implements ContainerRequestFilter {
             String email = parts[0];
             String password = parts[1];
 
-            // Prochaine étape :
-            // rechercher l'utilisateur et vérifier password avec bcrypt.
+            Utilisateur utilisateur = utilisateurRepository
+                    .findByEmail(email)
+                    .orElse(null);
+
+            if (utilisateur == null) {
+                abortUnauthorized(
+                        requestContext,
+                        "Identifiants incorrects"
+                );
+                return;
+            }
+
+            boolean passwordValide = BCrypt.checkpw(
+                    password,
+                    utilisateur.getMotDePasse()
+            );
+
+            if (!passwordValide) {
+                abortUnauthorized(
+                        requestContext,
+                        "Identifiants incorrects"
+                );
+                return;
+            }
 
         } catch (IllegalArgumentException e) {
 
