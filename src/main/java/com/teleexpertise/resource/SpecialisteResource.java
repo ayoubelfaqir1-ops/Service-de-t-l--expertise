@@ -6,12 +6,14 @@ import com.teleexpertise.service.SpecialisteService;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.annotation.security.RolesAllowed;
 
 import java.util.List;
 
 @Path("/specialistes")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@RolesAllowed("GENERALISTE")
 public class SpecialisteResource {
 
     private final SpecialisteService service = new SpecialisteService();
