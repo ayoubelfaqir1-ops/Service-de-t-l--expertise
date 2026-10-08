@@ -20,8 +20,6 @@ import java.util.List;
 
 @Path("/demandes")
 @Produces(MediaType.APPLICATION_JSON)
-public class DemandeExpertiseResource
-{
 @Consumes(MediaType.APPLICATION_JSON)
 public class DemandeExpertiseResource {
 
@@ -84,5 +82,4 @@ public class DemandeExpertiseResource {
                 .entity(demande)
                 .build();
     }
-}
 }
