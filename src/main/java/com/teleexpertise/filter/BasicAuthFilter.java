@@ -16,6 +16,9 @@ import com.teleexpertise.entity.Utilisateur;
 import com.teleexpertise.repository.UtilisateurRepository;
 import org.mindrot.jbcrypt.BCrypt;
 
+import com.teleexpertise.security.AuthenticatedUser;
+import com.teleexpertise.security.CustomSecurityContext;
+
 
 @Provider
 @Priority(Priorities.AUTHENTICATION)
@@ -86,6 +89,24 @@ public class BasicAuthFilter implements ContainerRequestFilter {
                 );
                 return;
             }
+
+            AuthenticatedUser authenticatedUser =
+                    new AuthenticatedUser(
+                            utilisateur.getId(),
+                            utilisateur.getEmail(),
+                            utilisateur.getRole()
+                    );
+
+            boolean secure =
+                    requestContext.getSecurityContext().isSecure();
+
+            CustomSecurityContext securityContext =
+                    new CustomSecurityContext(
+                            authenticatedUser,
+                            secure
+                    );
+
+            requestContext.setSecurityContext(securityContext);
 
         } catch (IllegalArgumentException e) {
 
