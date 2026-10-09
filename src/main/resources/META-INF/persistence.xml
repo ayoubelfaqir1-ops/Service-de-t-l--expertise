@@ -10,6 +10,7 @@
         <class>com.teleexpertise.entity.Specialiste</class>
         <class>com.teleexpertise.entity.DemandeExpertise</class>
         <class>com.teleexpertise.entity.Consultation</class>
+        <class>com.teleexpertise.entity.Utilisateur</class>
 
         <properties>
             <!-- Database Connection Settings -->

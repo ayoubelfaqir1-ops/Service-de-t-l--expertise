@@ -40,4 +40,12 @@ public class SpecialisteService {
                    .map(SpecialisteResponseDTO::fromEntity)
                    .toList();
     }
+    public Specialiste getByUtilisateurId(Long utilisateurId) {
+        return repo.findByUtilisateurId(utilisateurId)
+                .orElseThrow(() ->
+                        new NotFoundException(
+                                "Aucun spécialiste associé à cet utilisateur"
+                        )
+                );
+    }
 }

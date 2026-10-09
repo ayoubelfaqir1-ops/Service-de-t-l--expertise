@@ -6,6 +6,13 @@ import com.teleexpertise.enums.StatutDemandeExpertise;
 import com.teleexpertise.service.DemandeExpertiseService;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.SecurityContext;
+import com.teleexpertise.entity.Specialiste;
+import com.teleexpertise.security.AuthenticatedUser;
+import com.teleexpertise.service.SpecialisteService;
+import jakarta.ws.rs.ForbiddenException;
 
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.GET;
@@ -21,33 +28,55 @@ import java.util.List;
 @Path("/demandes")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+
 public class DemandeExpertiseResource {
 
     private final DemandeExpertiseService service = new DemandeExpertiseService();
+    private final SpecialisteService specialisteService = new SpecialisteService();
 
     @GET
+    @RolesAllowed({"GENERALISTE", "SPECIALISTE"})
     public Response getDemandes(
-            @QueryParam("specialisteId") Long specialisteId,
             @QueryParam("statut") String statut,
-            @QueryParam("consultationId") Long consultationId
-    )
-    {
+            @QueryParam("consultationId") Long consultationId,
+            @Context SecurityContext securityContext
+    ) {
 
-        // Cas GENERALISTE :
-        // recherche d'une demande par consultation
-        if (consultationId != null)
-        {
-            DemandeExpertise demande = service.getByConsultationId(consultationId);
-            return (Response.ok(demande).build());
+        // Cas 1 : recherche par consultation
+        // Réservée au GENERALISTE
+        if (consultationId != null) {
+
+            if (!securityContext.isUserInRole("GENERALISTE")) {
+                throw new ForbiddenException(
+                        "Seul un généraliste peut consulter une demande par consultation"
+                );
+            }
+
+            DemandeExpertise demande =
+                    service.getByConsultationId(consultationId);
+
+            return Response.ok(demande).build();
         }
 
-        // Cas SPECIALISTE provisoire
-        // TODO: remplacer specialisteId par SecurityContext
-        if (specialisteId == null)
-        {
-            throw new BadRequestException("specialisteId est requis temporairement");
+        // Cas 2 : consultation des demandes du spécialiste connecté
+        // Réservée au SPECIALISTE
+        if (!securityContext.isUserInRole("SPECIALISTE")) {
+            throw new ForbiddenException(
+                    "Seul un spécialiste peut consulter cette liste de demandes"
+            );
         }
 
+        // 1. Récupérer l'utilisateur authentifié
+        AuthenticatedUser authenticatedUser =
+                (AuthenticatedUser) securityContext.getUserPrincipal();
+
+        // 2. retrouver le spécialiste lié à cet utilisateur
+        Specialiste specialiste =
+                specialisteService.getByUtilisateurId(
+                        authenticatedUser.getId()
+                );
+
+        // 3. convertir le statut reçu dans l'URL
         StatutDemandeExpertise statutEnum = null;
 
         if (statut != null) {
@@ -62,9 +91,11 @@ public class DemandeExpertiseResource {
             }
         }
 
+        // 4. récupérer uniquement les demandes
+        // du spécialiste actuellement connecté
         List<DemandeExpertise> demandes =
                 service.getDemandesSpecialiste(
-                        specialisteId,
+                        specialiste.getId(),
                         statutEnum
                 );
 
@@ -72,6 +103,7 @@ public class DemandeExpertiseResource {
     }
 
 
+    @RolesAllowed("GENERALISTE")
     @POST
     public Response createDemande(CreateDemandeRequest request){
 
