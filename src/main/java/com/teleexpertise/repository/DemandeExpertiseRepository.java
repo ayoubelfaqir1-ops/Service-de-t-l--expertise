@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public class DemandeExpertiseRepository {
 
-    public DemandeExpertise create(DemandeExpertise demande){
+    public DemandeExpertise create(DemandeExpertise demande) {
 
         EntityManager em = JpaUtil.getEntityManager();
 
@@ -21,14 +21,12 @@ public class DemandeExpertiseRepository {
             em.getTransaction().commit();
 
             return demande;
-        }
-        catch(Exception e){
-            if(em.getTransaction().isActive()){
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
             throw e;
-        }
-        finally {
+        } finally {
             em.close();
         }
     }
@@ -37,9 +35,8 @@ public class DemandeExpertiseRepository {
         EntityManager em = JpaUtil.getEntityManager();
         try {
             return em.createQuery(
-                            "SELECT d FROM DemandeExpertise d WHERE d.specialisteId = :specialisteId",
-                            DemandeExpertise.class
-                    )
+                    "SELECT d FROM DemandeExpertise d WHERE d.specialisteId = :specialisteId",
+                    DemandeExpertise.class)
                     .setParameter("specialisteId", specialisteId)
                     .getResultList();
 
@@ -53,13 +50,40 @@ public class DemandeExpertiseRepository {
 
         try {
             return em.createQuery(
-                            "SELECT d FROM DemandeExpertise d WHERE d.consultationId = :consultationId",
-                            DemandeExpertise.class
-                    )
+                    "SELECT d FROM DemandeExpertise d WHERE d.consultationId = :consultationId",
+                    DemandeExpertise.class)
                     .setParameter("consultationId", consultationId)
                     .getResultStream()
                     .findFirst();
 
+        } finally {
+            em.close();
+        }
+    }
+
+    public DemandeExpertise findById(Long id) {
+        EntityManager em = JpaUtil.getEntityManager();
+        try {
+            return em.find(DemandeExpertise.class, id);
+        } finally {
+            em.close(); // Guarantees the connection is released back to the pool
+        }
+    }
+
+    public DemandeExpertise update(DemandeExpertise demande) {
+        EntityManager em = JpaUtil.getEntityManager();
+        try {
+            em.getTransaction().begin();
+
+            DemandeExpertise updated = em.merge(demande);
+
+            em.getTransaction().commit();
+            return updated;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback(); 
+            }
+            throw e;
         } finally {
             em.close();
         }

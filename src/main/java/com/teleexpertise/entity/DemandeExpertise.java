@@ -35,6 +35,9 @@ public class DemandeExpertise {
 
     private String recommandations;
 
+    @Column(name = "date_reponse")
+    private LocalDateTime dateReponse;
+
     @Column(name = "date_creation", nullable = false)
     private LocalDateTime dateCreation;
 
@@ -45,8 +48,7 @@ public class DemandeExpertise {
             Long consultationId,
             Long specialisteId,
             String question,
-            Priorite priorite
-    ) {
+            Priorite priorite) {
         this.consultationId = consultationId;
         this.specialisteId = specialisteId;
         this.question = question;
@@ -121,5 +123,30 @@ public class DemandeExpertise {
 
     public void setDateCreation(LocalDateTime dateCreation) {
         this.dateCreation = dateCreation;
+    }
+
+    public LocalDateTime getDateReponse() {
+        return dateReponse;
+    }
+
+    public void setDateReponse(LocalDateTime dateReponse) {
+        this.dateReponse = dateReponse;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.dateCreation == null) {
+            this.dateCreation = LocalDateTime.now();
+        }
+    }
+
+    public void repondre(String avis, String recommandations) {
+        if (this.statut == StatutDemandeExpertise.TERMINEE) {
+            throw new IllegalStateException("Cette demande a déjà été traitée");
+        }
+        this.avis = avis;
+        this.recommandations = recommandations;
+        this.dateReponse = LocalDateTime.now();
+        this.statut = StatutDemandeExpertise.TERMINEE;
     }
 }
